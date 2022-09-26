@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import torch
 from torch.quantization import quantize_dynamic
 from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
+from mangum import Mangum
 model_ckpt = "google/pegasus-cnn_dailymail"
 
 
@@ -17,8 +18,10 @@ class Model:
     def predict(self, text):
         return self.pipe(text)
 
-app = FastAPI()
 model = Model()
+app = FastAPI()
+handler = Mangum(app)
+
 
 class request_body(BaseModel):
     article: str
