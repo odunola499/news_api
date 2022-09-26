@@ -23,6 +23,11 @@ model = Model()
 class request_body(BaseModel):
     article: str
 
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Hello World"}
+
+    
 @app.post('/generate')
 async def generate_summary(data : request_body):
     summary = model.predict(data.article)
