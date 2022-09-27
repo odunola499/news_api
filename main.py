@@ -3,15 +3,17 @@ from pydantic import BaseModel
 import torch
 from torch.quantization import quantize_dynamic
 from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
+from mangum import Mangum
 model_ckpt = "google/pegasus-cnn_dailymail"
 
 
 class Model:
     def __init__(self, checkpoint = model_ckpt, quantize = True):
-        model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint).to(device)
         if quantize:
-            model = quantize_dynamic(model, {torch.nn.Linear}, dtype = torch.qint8)
-        tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+            model = quantize_dynamic(model, {torch.nn.Linear}, dtype = torch.qint8).to(device)
+        tokenizer = AutoTokenizer.from_pretrained(checkpoint).to(device)
         self.pipe = pipeline('summarization', model = model, tokenizer = tokenizer)
 
     def predict(self, text):
@@ -19,7 +21,7 @@ class Model:
 
 model = Model()
 app = FastAPI()
-
+handler = Mangum(app)
 
 
 class request_body(BaseModel):
