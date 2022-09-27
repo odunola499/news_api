@@ -4,7 +4,7 @@ import torch
 from torch.quantization import quantize_dynamic
 from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
 from mangum import Mangum
-model_ckpt = "google/pegasus-cnn_dailymail"
+model_ckpt = "sshleifer/distill-pegasus-cnn-16-4"
 
 
 class Model:
